@@ -27,33 +27,7 @@ class CPU:
     def load(self, filename):
         """Load a program into memory."""
         filename = sys.argv[1]
-        # print("filename", filename)
-        # For now, we've just hardcoded a program:
         
-        # with open(filename) as f:   
-        
-        #     for line in f:
-        #         line = line.split("#")
-        #         line = line[0].strip()
-        #         # print("line", line)
-        #         if line == "":
-        #             continue
-        #         val = int(line, 2)
-        #         # print("val", val)
-        #         self.ram_write(val, address )
-        # with open(filename) as file:
-        #     for line in file:
-        #         command_split = line.split('#')
-        #         instruction = command_split[0]
-
-        #         if instruction == "":
-        #             continue
-
-        #         first_bit = instruction[0]
-
-        #         if first_bit == '0' or first_bit == '1':
-        #             self.memory[address] = int(instruction[:8], 2) # convert instructions to binary
-        #             address += 1
         address = 0
         with open(filename) as f:
             for line in f:
@@ -64,11 +38,7 @@ class CPU:
                     continue
                 self.memory[address] = v
                 address += 1
-		# address += 1
-
-
-        # for instruction in program:
-        #     self.memory[address] = instruction
+		
                 
 
 
