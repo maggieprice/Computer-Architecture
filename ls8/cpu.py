@@ -29,10 +29,10 @@ class CPU:
         PUSH: self.PUSH,
         CALL: self.CALL,
         RET: self.RET,
-        CMP = self.CMP
-        JMP = self.JMP
-        JEQ = self.JEQ
-        JNE = self.JNE
+        CMP: self.CMP,
+        JMP: self.JMP,
+        JEQ: self.JEQ,
+        JNE: self.JNE
         }
         self.memory = [0] * 256
         self.reg = [0] * 8
@@ -101,11 +101,11 @@ class CPU:
         SP = self.SP
         self.reg[SP] = 0xf4
         while self.running:
-            operand_a = self.ram_read(self.pc +1)
-            operand_b = self.ram_read(self.pc +2)
+            # operand_a = self.ram_read(self.pc +1)
+            # operand_b = self.ram_read(self.pc +2)
             IR = self.ram_read(self.pc) #instruction register 
             if IR in self.ir:
-                self.ir[IR](operand_a, operand_b)
+                self.ir[IR]()
             # elif IR == PUSH:
                 
     def ram_write(self, MDR, MAR):
@@ -115,33 +115,22 @@ class CPU:
         MDR = self.memory[MAR]
         return MDR
 
-    def equal(self, FL):
-        #`E` Equal: during a `CMP`, set to 1 if registerA is equal to registerB, zero otherwise.
-        # while CMP:
-        FL = self.memory[FL]
-        #     if registerA == registerB:
-        #         E = 1
-        #         return E
-        #     else:
-        #         E = 0
-        #         return E
-    
-    def HLT(self, operand_a, operand_b):
+    def HLT(self):
         self.running = False
         
-    def LDI(self, operand_a, operand_b):
+    def LDI(self):
         operand_a = self.ram_read(self.pc + 1)
         operand_b = self.ram_read(self.pc + 2)
         self.reg[operand_a] = operand_b
         self.pc +=3 
 
-    def PRN(self, operand_a, operand_b):
+    def PRN(self):
         operand_a = self.ram_read(self.pc + 1)
         val = self.reg[operand_a]
         print(val)
         self.pc += 2
 
-    def MUL(self, operand_a, operand_b):
+    def MUL(self):
         operand_a = self.ram_read(self.pc + 1)
         operand_b = self.ram_read(self.pc + 2)
         self.alu("MUL", operand_a, operand_b)
@@ -149,7 +138,7 @@ class CPU:
         # Multiply the values in two regs together and store the result in regA.
 
 
-    def POP(self, operand_a, operand_b):
+    def POP(self):
         # Pop the value at the top of the stack into the given register.
         # Copy the value from the address pointed to by SP to the given register.
         # Increment SP.
@@ -160,7 +149,7 @@ class CPU:
         self.pc += 2
 
 
-    def PUSH(self, operand_a, operand_b):
+    def PUSH(self):
         # Push the value in the given register on the stack.
         # Decrement the SP.
         # Copy the value in the given register to the address pointed to by SP.
@@ -175,12 +164,10 @@ class CPU:
         self.memory[top_of_stack_addr] = val
         self.pc += 2
     
-    def CALL(self, operand_a, operand_b):
+    def CALL(self):
         # 1. The address of the ***instruction*** _directly after_ `CALL` is
         # pushed onto the stack. This allows us to return to where we left off when the subroutine finishes executing.
         # 2. The PC is set to the address stored in the given register. We jump to that location in RAM and execute the first instruction in the subroutine. The PC can move forward or backwards from its current location.
-        operand_a = self.ram_read(self.pc + 1)
-        operand_b = self.ram_read(self.pc + 2)
         SP = self.SP
         # Where we're going to RET to
         return_addr = self.pc + 2  
@@ -194,16 +181,10 @@ class CPU:
         self.pc = subroutine_addr
 
 
-    def RET(self, operand_a, operand_b):
+    def RET(self):
         # Return from subroutine.
         # Pop the value from the top of the stack and store it in the `PC`.
-        operand_a = self.ram_read(self.pc + 1)
-        operand_b = self.ram_read(self.pc + 2)
         SP = self.SP
-        # return_addr = self.pc + 2
-        
-        # reg_num = self.memory[self.pc + 2]
-        # subroutine_addr = self.reg[reg_num]
         # Call it
         self.pc = self.memory[self.reg[SP]]
         self.reg[SP] += 1
@@ -211,14 +192,11 @@ class CPU:
     def CMP(self):
         # Compare the values in two registers.
         # * If they are equal, set the Equal `E` flag to 1, otherwise set it to 0.
-            FL = self.memory[FL]
-            E = self.memory[E]
             operand_a = self.ram_read(self.pc + 1)
             operand_b = self.ram_read(self.pc + 2)
             self.alu("CMP", operand_a, operand_b)
             self.pc += 3
         
-    
 
     def JMP(self):
         # Jump to the address stored in the given register.
@@ -227,15 +205,21 @@ class CPU:
         self.pc = self.reg[reg_num]
 
 
-    def JEQ(self, operand_a, operand_b):
+    def JEQ(self):
         # If `equal` flag is set (true), jump to the address stored in the given register.
-        
-
-
-    def JNE(self, operand_a, operand_b):
-        # If `E` flag is clear (false, 0), jump to the address stored in the given register.
-        if self.FL is None:
+        if self.FL == 1:
             reg_num = self.memory[self.pc + 1]
             self.pc = self.reg[reg_num]
+        else:
+            self.pc +=2
+
+
+    def JNE(self):
+        # If `E` flag is clear (false, 0), jump to the address stored in the given register.
+        if self.FL == 0:
+            reg_num = self.memory[self.pc + 1]
+            self.pc = self.reg[reg_num]
+        else:
+            self.pc +=2
 
 
