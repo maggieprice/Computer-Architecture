@@ -25,7 +25,7 @@ class CPU:
         self.memory = [0] * 256
         self.reg = [0] * 8
         self.pc = 0
-        self.running = False
+        self.running = True
         self.SP = 7
         
 
@@ -129,14 +129,19 @@ class CPU:
             # Copy the value from the address pointed to by SP to the given register.
             # Increment SP.
         SP = self.SP
-        self.reg[SP] += 1
+        # self.reg[SP] += 1
+        # reg_num = self.ram_read(self.pc + 1)
+        # val = self.ram_read(reg_num)  # <-- this is the value that we want to push
+        # # Figure out where to store it
+        # top_of_stack_addr = self.reg[SP]
+        # # Store it
+        # self.memory[top_of_stack_addr] = val
+        # self.pc += 2
         reg_num = self.memory[self.pc + 1]
-        val = self.reg[reg_num]  # <-- this is the value that we want to push
-        # Figure out where to store it
-        top_of_stack_addr = self.reg[SP]
-        # Store it
-        self.memory[top_of_stack_addr] = val
+        self.reg[reg_num] = self.memory[self.reg[SP]]
+        self.reg[SP] += 1
         self.pc += 2
+
 
 
 
